@@ -16,10 +16,15 @@ void InitFun();					//初始化函数指针和变量
 void DeXorCode();				//解密操作
 void RecReloc();				//修复重定位操作
 void RecIAT();					//修复IAT操作
+void AntiDebug();               //反调试函数
+bool find_debuger(const char *processname);    //字符串匹配
+bool find_virus_path(const char *processname); //敏感字符检测
 SHELL_DATA g_stcShellData = { (DWORD)Start };
 								//Shell用到的全局变量结构体
 DWORD dwImageBase	= 0;		//整个程序的镜像基址
 DWORD dwPEOEP		= 0;		//PE文件的OEP
+char debug_name[5][100] = { "idaq.exe","idaq64.exe","SbieSvc.exe","OllyDBG.exe" };   //调试器名称
+char path_name[7][100] = { "debug","virus","temp","ida","olly","disasm","hack" };    //敏感路径
 
 //Shell部分用到的函数定义
 fnGetProcAddress	g_pfnGetProcAddress		= NULL;
@@ -29,6 +34,12 @@ fnVirtualProtect	g_pfnVirtualProtect		= NULL;
 fnVirtualAlloc		g_pfnVirtualAlloc		= NULL;
 fnExitProcess		g_pfnExitProcess		= NULL;
 fnMessageBox		g_pfnMessageBoxA		= NULL;
+fnIsDebuggerPresent g_pfnIsDebuggerPresent  = NULL;
+fnGetModuleFileName g_pfnGetModuleFileName  = NULL;
+fnProcess32First    g_pfnProcess32First     = NULL;
+fnProcess32Next     g_pfnProcess32Next      = NULL;
+fnCreateToolhelp32Snapshot g_pfnCreateToolhelp32Snapshot = NULL;
+
 
  //************************************************************
 // 函数名称:	Start
@@ -43,12 +54,18 @@ __declspec(naked) void Start()
 
 	InitFun();
 
+	if (g_stcShellData.bIsAntiDebug)
+	{
+		AntiDebug();
+	}
+
 	DeXorCode();
 
 	if (g_stcShellData.stcPERelocDir.VirtualAddress)
 	{
 		RecReloc();
 	}
+
 	RecIAT();
 
 	if (g_stcShellData.bIsShowMesBox)
@@ -220,6 +237,11 @@ void InitFun()
 	g_pfnVirtualProtect		= (fnVirtualProtect)g_pfnGetProcAddress(hKernel32, "VirtualProtect");
 	g_pfnExitProcess		= (fnExitProcess)g_pfnGetProcAddress(hKernel32, "ExitProcess");
 	g_pfnVirtualAlloc		= (fnVirtualAlloc)g_pfnGetProcAddress(hKernel32, "VirtualAlloc");
+	g_pfnIsDebuggerPresent  = (fnIsDebuggerPresent)g_pfnGetProcAddress(hKernel32, "IsDebuggerPresent");
+	g_pfnGetModuleFileName  = (fnGetModuleFileName)g_pfnGetProcAddress(hKernel32, "GetModuleFileName");
+	g_pfnProcess32First     = (fnProcess32First)g_pfnGetProcAddress(hKernel32, "Process32First");
+	g_pfnProcess32Next      = (fnProcess32Next)g_pfnGetProcAddress(hKernel32, "Process32Next");
+	g_pfnCreateToolhelp32Snapshot = (fnCreateToolhelp32Snapshot)g_pfnGetProcAddress(hKernel32, "CreateToolhelp32Snapshot");
 
 	//从user32中获取函数
 	HMODULE hUser32			= g_pfnLoadLibraryA("user32.dll");
@@ -319,4 +341,70 @@ DWORD MyGetProcAddress()
 		}
 	}
 	return 0;
+}
+
+//************************************************************
+// 函数名称:	AntiDebug
+// 函数说明:	反调试
+// 作	者:	    Joliph
+// 时	间:	2018/5/19
+// 返 回	值:	void
+//************************************************************
+void AntiDebug() {
+	PROCESSENTRY32 pe32;
+	pe32.dwSize = sizeof(pe32);
+	HANDLE hprocesssnapshot = g_pfnCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (INVALID_HANDLE_VALUE != hprocesssnapshot) {
+		BOOL bprocess = g_pfnProcess32First(hprocesssnapshot, &pe32);
+		while (bprocess) {
+			if (find_debuger((char*)pe32.szExeFile)) {
+				g_pfnExitProcess(0);
+			}
+			bprocess = g_pfnProcess32Next(hprocesssnapshot, &pe32);
+		}
+	}
+
+	char filename[MAX_PATH];
+	if (g_pfnGetModuleFileName(NULL,(LPTSTR)filename,MAX_PATH)) {
+		if (find_virus_path(filename)) {
+			g_pfnExitProcess(0);
+		}
+	}
+
+	if (g_pfnIsDebuggerPresent()) {
+		g_pfnExitProcess(0);
+	}
+}
+
+bool find_debuger(const char *processname) {
+	for (int i = 0; i<4; i++) {
+		char *s = debug_name[i];
+		while (*processname != '\0' && *processname == *s) {
+			processname++;
+			s++;
+		}
+		if (*processname == '\0' && *s == '\0') return true;
+	}
+	return false;
+}
+
+bool find_virus_path(const char *processname) {
+	const char *ori = processname;
+	for (int i = 0; i<7; i++) {
+		processname = ori;
+		while (*processname != '\0') {
+			char *s = path_name[i];
+			while (*processname != *s && *processname != (*s) - 32 && *processname != '\0') {
+				processname++;
+			}
+			while (*processname != '\0' && (*processname == *s || *processname == (*s) - 32)) {
+				processname++;
+				s++;
+			}
+			if (*s == '\0') {
+				return true;
+			}
+		}
+	}
+	return false;
 }

@@ -1,6 +1,1 @@
-# CyxvcProtect
-
-The resource is from the internet: 
-- https://bbs.pediy.com/thread-206804.htm?source=1
-
-- 待更新...
+﻿﻿﻿﻿# CyxvcProtect**简要介绍：**  - 原版链接：[看雪学院----------用C++实现的壳(基础版)](https://bbs.pediy.com/thread-206804.htm?source=1)  - 此项目仅为学习PE文件加壳的具体细节和实现方式，提升对加壳与脱壳的理解，请勿用于非法用途            **2018.5.18更新：**  - 修改图标 修改UI布局  - 修改弹窗说明  - 添加反调试机制(可选)     1. 3环下获取进程列表，进行敏感进程比对(反调试，反沙箱，反虚拟机)     2. 获取自身全路径，进行敏感词检测     3. 调试状态检测  

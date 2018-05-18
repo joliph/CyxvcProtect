@@ -21,6 +21,7 @@ extern"C"  typedef struct _SHELL_DATA
 	DWORD					dwIATSectionSize;	//IAT所在段大小
 
 	BOOL					bIsShowMesBox;		//是否显示MessageBox
+	BOOL					bIsAntiDebug;		//是否开启反调试
 
 }SHELL_DATA, *PSHELL_DATA;
 
@@ -37,3 +38,8 @@ typedef BOOL(WINAPI *fnVirtualProtect)(_In_ LPVOID lpAddress, _In_ SIZE_T dwSize
 typedef LPVOID(WINAPI *fnVirtualAlloc)(_In_opt_ LPVOID lpAddress, _In_ SIZE_T dwSize, _In_ DWORD flAllocationType, _In_ DWORD flProtect);
 typedef void(WINAPI *fnExitProcess)(_In_ UINT uExitCode);
 typedef int(WINAPI *fnMessageBox)(HWND hWnd, LPSTR lpText, LPSTR lpCaption, UINT uType);
+typedef BOOL(WINAPI *fnIsDebuggerPresent)(void);
+typedef DWORD(WINAPI *fnGetModuleFileName)(_In_opt_ HMODULE hModule,_Out_ LPTSTR lpFilename,_In_ DWORD nSize);
+typedef HANDLE(WINAPI *fnCreateToolhelp32Snapshot)(DWORD dwFlags, DWORD th32ProcessID);
+typedef BOOL(WINAPI *fnProcess32First)(_In_ HANDLE hSnapshot, _Out_ LPPROCESSENTRY32 lppe);
+typedef BOOL(WINAPI *fnProcess32Next)(_In_ HANDLE hSnapshot,_Out_ LPPROCESSENTRY32 lppe);

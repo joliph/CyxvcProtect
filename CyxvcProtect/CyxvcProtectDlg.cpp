@@ -65,7 +65,7 @@ BOOL CCyxvcProtectDlg::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化代码
 	((CButton*)GetDlgItem(IDC_CHECK1))->SetCheck(1);
-
+	((CButton*)GetDlgItem(IDC_CHECK2))->SetCheck(1);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -143,9 +143,9 @@ void CCyxvcProtectDlg::OnBnClicked_Pack()
 	CPACK objPACK;
 
 	//获取是否显示MessageBox
-	int nStatus = ((CButton*)GetDlgItem(IDC_CHECK1))->GetCheck();
-
-	if (objPACK.Pack(m_strFilePath, nStatus))
+	int nStatus1 = ((CButton*)GetDlgItem(IDC_CHECK1))->GetCheck();
+	int nStatus2 = ((CButton*)GetDlgItem(IDC_CHECK2))->GetCheck();
+	if (objPACK.Pack(m_strFilePath, nStatus1, nStatus2))
 		MessageBox(_T("加壳成功！"), _T("提示"), MB_OK);
 
 }

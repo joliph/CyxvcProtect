@@ -8,7 +8,7 @@ public:
 	~CPACK();
 public:
 	//加壳处理
-	BOOL Pack(CString strFilePath,BOOL bIsShowMesBox);			
+	BOOL Pack(CString strFilePath, BOOL bIsShowMesBox, BOOL bIsAntiDebug);
 
 	//保存最终加壳后的文件
 	BOOL SaveFinalFile(LPBYTE pFinalBuf, DWORD pFinalBufSize,CString strFilePath);		

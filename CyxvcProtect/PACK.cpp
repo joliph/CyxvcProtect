@@ -22,7 +22,7 @@ CPACK::~CPACK()
 // 参	数:	BOOL bIsShowMesBox
 // 返 回	值:	BOOL
 //************************************************************
-BOOL CPACK::Pack(CString strFilePath, BOOL bIsShowMesBox)
+BOOL CPACK::Pack(CString strFilePath, BOOL bIsShowMesBox,BOOL bIsAntiDebug)
 {
 	//1.读取PE文件信息并保存
 	CPE objPE;
@@ -55,6 +55,7 @@ BOOL CPACK::Pack(CString strFilePath, BOOL bIsShowMesBox)
 	pstcShellData->dwIATSectionBase = objPE.m_IATSectionBase;
 	pstcShellData->dwIATSectionSize = objPE.m_IATSectionSize;
 	pstcShellData->bIsShowMesBox = bIsShowMesBox;
+	pstcShellData->bIsAntiDebug = bIsAntiDebug;
 
 	//4.将Shell附加到PE文件
 	//4.1.读取Shell代码
