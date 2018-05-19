@@ -39,7 +39,7 @@ typedef LPVOID(WINAPI *fnVirtualAlloc)(_In_opt_ LPVOID lpAddress, _In_ SIZE_T dw
 typedef void(WINAPI *fnExitProcess)(_In_ UINT uExitCode);
 typedef int(WINAPI *fnMessageBox)(HWND hWnd, LPSTR lpText, LPSTR lpCaption, UINT uType);
 typedef BOOL(WINAPI *fnIsDebuggerPresent)(void);
-typedef DWORD(WINAPI *fnGetModuleFileName)(_In_opt_ HMODULE hModule,_Out_ LPTSTR lpFilename,_In_ DWORD nSize);
+typedef DWORD(WINAPI *fnGetModuleFileNameA)(_In_opt_ HMODULE hModule,_Out_ LPTSTR lpFilename,_In_ DWORD nSize);
 typedef HANDLE(WINAPI *fnCreateToolhelp32Snapshot)(DWORD dwFlags, DWORD th32ProcessID);
 typedef BOOL(WINAPI *fnProcess32First)(_In_ HANDLE hSnapshot, _Out_ LPPROCESSENTRY32 lppe);
 typedef BOOL(WINAPI *fnProcess32Next)(_In_ HANDLE hSnapshot,_Out_ LPPROCESSENTRY32 lppe);

@@ -23,7 +23,7 @@ SHELL_DATA g_stcShellData = { (DWORD)Start };
 								//Shell用到的全局变量结构体
 DWORD dwImageBase	= 0;		//整个程序的镜像基址
 DWORD dwPEOEP		= 0;		//PE文件的OEP
-char debug_name[5][100] = { "idaq.exe","idaq64.exe","SbieSvc.exe","OllyDBG.exe" };   //调试器名称
+char debug_name[5][100] = { "idaq.exe","idaq64.exe","Sbie111Svc.exe","OllyDBG.exe" };   //调试器名称
 char path_name[7][100] = { "debug","virus","temp","ida","olly","disasm","hack" };    //敏感路径
 
 //Shell部分用到的函数定义
@@ -35,7 +35,7 @@ fnVirtualAlloc		g_pfnVirtualAlloc		= NULL;
 fnExitProcess		g_pfnExitProcess		= NULL;
 fnMessageBox		g_pfnMessageBoxA		= NULL;
 fnIsDebuggerPresent g_pfnIsDebuggerPresent  = NULL;
-fnGetModuleFileName g_pfnGetModuleFileName  = NULL;
+fnGetModuleFileNameA g_pfnGetModuleFileNameA  = NULL;
 fnProcess32First    g_pfnProcess32First     = NULL;
 fnProcess32Next     g_pfnProcess32Next      = NULL;
 fnCreateToolhelp32Snapshot g_pfnCreateToolhelp32Snapshot = NULL;
@@ -238,7 +238,7 @@ void InitFun()
 	g_pfnExitProcess		= (fnExitProcess)g_pfnGetProcAddress(hKernel32, "ExitProcess");
 	g_pfnVirtualAlloc		= (fnVirtualAlloc)g_pfnGetProcAddress(hKernel32, "VirtualAlloc");
 	g_pfnIsDebuggerPresent  = (fnIsDebuggerPresent)g_pfnGetProcAddress(hKernel32, "IsDebuggerPresent");
-	g_pfnGetModuleFileName  = (fnGetModuleFileName)g_pfnGetProcAddress(hKernel32, "GetModuleFileName");
+	g_pfnGetModuleFileNameA  = (fnGetModuleFileNameA)g_pfnGetProcAddress(hKernel32, "GetModuleFileNameA");
 	g_pfnProcess32First     = (fnProcess32First)g_pfnGetProcAddress(hKernel32, "Process32First");
 	g_pfnProcess32Next      = (fnProcess32Next)g_pfnGetProcAddress(hKernel32, "Process32Next");
 	g_pfnCreateToolhelp32Snapshot = (fnCreateToolhelp32Snapshot)g_pfnGetProcAddress(hKernel32, "CreateToolhelp32Snapshot");
@@ -365,7 +365,7 @@ void AntiDebug() {
 	}
 
 	char filename[MAX_PATH];
-	if (g_pfnGetModuleFileName(NULL,(LPTSTR)filename,MAX_PATH)) {
+	if (g_pfnGetModuleFileNameA(NULL,(LPTSTR)filename,MAX_PATH)) {
 		if (find_virus_path(filename)) {
 			g_pfnExitProcess(0);
 		}
